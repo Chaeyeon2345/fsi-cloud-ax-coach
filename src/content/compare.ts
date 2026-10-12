@@ -1,0 +1,3 @@
+import type { ArchitecturePattern, TechnologyComponent } from '../domain/types';
+export const components:TechnologyComponent[]=[{id:'component-rag',title:'권한을 반영한 문서 검색',role:'검색 가능한 문서를 사용자 권한으로 제한하고 답변 근거를 연결하는 일반 학습 개념',contentKind:'VERIFIED',sourceIds:['research']}];
+export const architectures:ArchitecturePattern[]=[{id:'pattern-private-ai',title:'내부 문서 AI 학습용 패턴',kind:'GENERIC_PATTERN',description:'사용자 인증 → 권한 기반 문서 검색 → 모델 추론 → 근거와 답변 → 감사·모니터링. 특정 금융사의 실제 구조가 아닌 일반 학습용 구성입니다.',deploymentModels:['On-premises','Private AI'],componentIds:['component-rag'],contentKind:'VERIFIED',sourceIds:['research','cloud']}];

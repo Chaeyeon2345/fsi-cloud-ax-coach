@@ -1,0 +1,33 @@
+node_modules/
+dist/
+.env
+.env.*
+private/
+.DS_Store
+*.log
+# 제3자 PDF 원본·추출문, 로컬 작업 파일은 저장소·배포에 포함하지 않는다
+references/*.pdf
+tmp/
+.claude/
+*.zip
+*.tsbuildinfo
+
+# 로컬 개발·기획 문서는 공개 저장소에 올리지 않는다 (README.md는 제외)
+00_START_HERE.md
+01_PRD_*.md
+02_INFORMATION_ARCHITECTURE.md
+03_CONTENT_SOURCE_POLICY.md
+04_DATA_SCHEMA.json
+05_UI_WIREFRAME.md
+06_*.md
+07_*.md
+08_*.md
+09_*.md
+10_*.md
+11_*.md
+12_*.md
+13_*.md
+14_*.md
+AGENTS.md
+CONTENT_REVIEW.md
+V2_CHANGE_PLAN.md

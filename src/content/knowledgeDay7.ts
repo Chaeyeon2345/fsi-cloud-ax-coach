@@ -1,0 +1,178 @@
+// Phase C · Day 7 지식 카드 (AWS FSI Architecture 기본).
+// 근거 유형: TECH_FACT = AWS 공식 문서로 확인한 기술 사실 / ARCHITECTURE_GUIDE = 금융 요구사항을 기술 구성에 연결한 교육용 분석(법적 의무 아님) / INTERPRETATION = 학습용 해석.
+// 이 카드들은 “AWS 서비스를 쓰면 금융 규제를 자동 준수한다”는 뜻이 아니다. AWS 공동 책임 모델 페이지도 컴플라이언스가 자동이라고 설명하지 않는다.
+import { card2 } from './cardKit';
+
+export const awsFsiOverview = card2({
+  id: 'aws-fsi-overview', title: 'AWS FSI Architecture 개요: 서비스 목록이 아니라 요구조건에서 출발',
+  domain: 'CLOUD_ARCHITECTURE', secondaryDomains: ['SECURITY_RESILIENCE'], tech: true,
+  primary: ['aws-fsi-lens'], supporting: ['aws-shared-responsibility', 'aws-fsi-rel04'],
+  texts: [
+    'AWS Financial Services Industry Lens는 Well-Architected의 여섯 pillar에 대한 금융업 설계 원칙과 모범사례로, 사용자가 정의하는 위험·통제 목표(감독기관 요건과의 정합 포함)에 맞춰 복원력·보안·비용·운영 성과를 높이는 워크로드 설계를 다룹니다.',
+    '금융 고객의 질문은 서비스 이름이 아니라 업무 중요도, 연결 방식, 데이터 보호, 감사 가능성, 복원력입니다. 그래서 Lens의 “위험·통제 목표에서 출발해 측정·테스트한다”는 접근이 서비스 나열보다 대화에 도움이 됩니다.',
+    '이 카드는 Lens의 소개, 개정 이력, FSIREL04 핵심만 확인한 범위입니다. Lens의 세부 섹션(위험·통제 목표, 복원력 등) 본문은 확인하지 못했습니다.',
+    '“AWS로 가능합니까?”라는 질문에 서비스 목록으로 답하면 고객의 업무 중요도, 데이터, 연결, 장애 허용수준과 이어지지 않아 설득력이 약합니다.',
+    'Lens는 2020-05 최초 발행되었고 2024-05에 sustainability pillar를 추가하는 메이저 업데이트, 2026-01-27에 생성형 AI 가이드를 반영하는 메이저 업데이트가 있었습니다.',
+    'AWS 공동 책임 모델은 “클라우드의 보안”은 AWS, “클라우드 내 보안”은 고객 책임으로 나누며 고객 책임 범위는 이용하는 서비스에 따라 달라집니다. 페이지는 컴플라이언스가 자동이라고 설명하지 않고, AWS가 완전히 상속해 주는 통제로 물리·환경 통제를 제시하며 나머지는 공유 또는 고객 책임으로 둡니다.',
+    'FSIREL04는 규제기관이 중요 워크로드로 지정하면 더 엄격히 점검하므로 합리적인 복구 시간과 최소 데이터 손실로 복구할 수 있음을 입증하라고 설명합니다. 외부 의존성(파트너 연동 등)이 장애조치 환경에서도 접근 가능해야 하고, 의존성 장애에도 계속 동작하거나 우아하게 실패하도록 분리하며 카오스 엔지니어링으로 검증하라고 합니다.',
+    '구조는 위에서 아래로 보면 정리됩니다. 연결(On-prem↔AWS) → 네트워크(VPC·Subnet·Route·Security Group·NACL) → 애플리케이션·데이터 → 통제(IAM·KMS·CloudTrail·Config·GuardDuty·Security Hub) → 복원력(Multi-AZ·Backup·Cross-Region·DRS)입니다. 이는 교육용 구성 분석이며 어떤 서비스를 쓸지는 업무 중요도와 요구사항으로 정합니다.',
+    '고객이 서비스 이름을 물으면 먼저 업무 중요도, 연결 방식, 데이터 보호, 감사, RTO/RPO를 확인하고 SA와 설계하세요. “AWS를 쓰면 규제를 준수한다”는 표현은 쓰지 마세요.',
+    '금융권 AWS 설계는 서비스 목록이 아니라 연결, 권한, 암호화, 감사, 복원력부터 봐야 합니다. 어떤 서비스를 쓸지는 업무 중요도와 RTO/RPO, 데이터 요구사항을 확인한 뒤 SA와 설계하겠습니다.',
+  ],
+  types: { 2: 'INTERPRETATION', 7: 'ARCHITECTURE_GUIDE' },
+  caveats: ['FSI Lens의 Risk and control objectives·Security·Resilience 섹션 본문은 확인하지 못했습니다(제목만 반환).', '공동 책임 모델 페이지는 요약을 거쳐 확인한 내용입니다. 서비스별 고객 책임 범위는 서비스 문서에서 재확인하세요.'],
+  sales: {
+    amMustKnow: ['금융 AWS 설계는 서비스 이름보다 업무 중요도·연결·데이터 보호·감사 가능성·복원력이 먼저다.', '“AWS를 쓰면 규제를 자동 준수한다”고 말하지 않는다(공동 책임 모델).', 'AM은 CLI를 외우는 사람이 아니라 고객 요구를 설계 질문으로 번역하는 사람이다.'],
+    discoveryQuestions: ['On-prem과 AWS는 어떤 방식으로 연결할 계획입니까?', '인터넷을 거치면 안 되는 통신구간이 있습니까?', '사용자/관리자/서비스 권한을 어떻게 분리하고 있습니까?', '어떤 데이터에 어떤 암호화 및 Key control이 필요합니까?', '장애 허용수준과 RTO/RPO는 무엇입니까?'],
+    architectureMeaning: '구조도는 연결, 네트워크, 애플리케이션·데이터, 통제, 복원력 층으로 그리고 각 층의 책임 경계(AWS와 고객)를 표시해야 합니다.',
+    relatedServices: ['Cloud assessment', 'Landing Zone', 'Security architecture', 'Network connectivity design', 'BCP/DR design'],
+    saHandoff: ['BGP/VIF/TGW 상세설계', 'CIDR/IP Plan', 'KMS Key policy', 'Cross-account IAM', 'Multi-Region failover 상세'],
+    nextQuestions: ['AWS 공동 책임 모델에서 고객 책임은 어디까지입니까?', 'FSI Lens로 무엇을 점검할 수 있습니까?', '규제 대응 증적은 AWS 기능만으로 충분합니까?'],
+    commonMistakes: ['서비스 목록만 나열한다.', 'AWS 사용을 규제 준수와 동일시한다.', '업무 중요도 확인 없이 구성을 제안한다.'],
+  },
+});
+
+export const directConnect = card2({
+  id: 'direct-connect', title: 'AWS Direct Connect: 전용 연결이지만 기본 암호화는 아니다',
+  domain: 'CLOUD_ARCHITECTURE', tech: true,
+  primary: ['aws-direct-connect'], supporting: ['aws-dx-encryption'],
+  texts: [
+    'Direct Connect는 고객 네트워크를 Direct Connect 로케이션에 표준 이더넷 광케이블로 연결하고 그 위에 virtual interface를 만들어, 인터넷 사업자를 거치지 않고 AWS에 접근하게 하는 서비스입니다.',
+    '금융사는 내부 전산센터와 클라우드 사이에 일관된 경로가 필요한 경우가 많아 전용 연결이 자주 논의됩니다. 다만 “전용선이니 안전하다”로 단순화하면 암호화 요구를 놓칩니다.',
+    '이 카드는 Direct Connect 사용자 가이드와 전송 중 암호화 페이지에서 확인한 범위입니다. VPN over Direct Connect 개념도 백서 페이지는 본문을 확인하지 못했습니다.',
+    '“Direct Connect = 암호화”라고 설명하는 오해가 고객 보안 검토 단계에서 문제가 됩니다. 공식 문서는 그렇게 설명하지 않습니다.',
+    'Private VIF는 사설 IP로 VPC에 접근하고(Direct Connect gateway 경유 시 여러 리전의 VPC도 가능) Public VIF는 S3 같은 AWS 공개 서비스에 공인 IP로, Transit VIF는 Direct Connect gateway에 연결된 Transit Gateway에 접근합니다.',
+    '공식 문서는 Direct Connect가 기본적으로 전송 중 트래픽을 암호화하지 않는다고 명시합니다. 암호화는 Site-to-Site VPN을 조합한 IPsec 암호화나 MACsec으로 구성합니다. MACsec은 고객 장비와 Direct Connect 로케이션 사이 구간의 Layer 2 암호화이며 지원되는 dedicated 연결에 한하고 hosted 연결은 지원하지 않으며 종단간 암호화가 아닙니다.',
+    '금융 구조도에는 전산센터, 회선(이중화 여부), 로케이션, VIF 종류, 암호화 방식(VPN 또는 MACsec), 라우팅 경계를 표시하면 설명이 구체화됩니다. 회선 이중화와 암호화 선택은 요구사항과 비용을 보고 SA와 정합니다.',
+    'Hybrid나 Private AI처럼 내부 데이터와 Cloud 서비스를 잇는 구조에서는 이 연결 구간이 지연·가용성·보안 논의의 중심이 되므로, 연결 방식과 암호화 방식이 설계의 출발점이 됩니다(해석).',
+    '고객이 인터넷을 거치면 안 되는 구간이 있다고 하면 Direct Connect를 검토 후보로 두되, 암호화 요구가 있는지 반드시 함께 묻습니다. 구성(BGP/VIF/TGW)은 SA 영역입니다.',
+    'Direct Connect는 On-prem과 AWS를 잇는 전용 네트워크 연결 수단입니다. 다만 기본 암호화는 아니어서 필요하면 VPN이나 MACsec을 조합합니다. 연결 방식과 암호화 요구를 확인한 뒤 SA와 설계하겠습니다.',
+  ],
+  types: { 2: 'INTERPRETATION', 6: 'ARCHITECTURE_GUIDE' },
+  caveats: ['VPC 연결 옵션 백서의 “VPN over Direct Connect” 본문은 확인하지 못했습니다. 같은 취지는 전송 중 암호화 페이지에서 확인했습니다.'],
+  sales: {
+    amMustKnow: ['Direct Connect는 전용 연결 수단이며 암호화 자체가 아니다.', 'VIF 종류(Private/Transit/Public)에 따라 접근 대상이 다르다.', '암호화 요구가 있으면 VPN 또는 MACsec 조합을 검토한다.'],
+    discoveryQuestions: ['On-prem과 AWS는 어떤 방식으로 연결할 계획입니까?', '인터넷을 거치면 안 되는 통신구간이 있습니까?', '구간 암호화 요구가 있습니까?', '회선 이중화와 장애 시 대체 경로는 어떻게 됩니까?', '전산센터와 가장 가까운 연결 지점은 어디입니까?'],
+    architectureMeaning: '연결 구간은 구조도에서 전산센터–회선–AWS 로케이션–VPC/Transit Gateway의 경로와 암호화 지점으로 그립니다.',
+    relatedServices: ['Network connectivity design', 'Hybrid architecture', 'Landing Zone'],
+    saHandoff: ['BGP/VIF/TGW 상세설계', '회선 이중화 구성', 'MACsec/VPN 암호화 구성'],
+    nextQuestions: ['MACsec은 모든 연결에서 쓸 수 있습니까?', 'Direct Connect와 VPN은 어떻게 함께 씁니까?', '연결 장애 시 어떻게 전환합니까?'],
+    commonMistakes: ['Direct Connect를 암호화와 동일시한다.', '회선 이중화 없이 단일 회선을 제안한다.'],
+  },
+});
+
+export const privateConnectivity = card2({
+  id: 'private-connectivity', title: 'PrivateLink·VPC Endpoint와 VPC Peering: 역할이 다르다',
+  domain: 'CLOUD_ARCHITECTURE', tech: true,
+  primary: ['aws-privatelink'], supporting: ['aws-vpc-peering'],
+  texts: [
+    'PrivateLink는 인터넷 게이트웨이, NAT, 공인 IP, Direct Connect, VPN 없이도 VPC에서 서비스에 사설로 연결하게 해 주는 기술이며 접근 가능한 API 엔드포인트와 서비스를 제어할 수 있다고 공식 문서가 설명합니다.',
+    '금융 고객은 AWS 서비스나 SaaS에 접근할 때 공용 인터넷 경로를 줄이길 원하는 경우가 많아 사설 접근 수단이 논의됩니다.',
+    '이 카드는 PrivateLink·VPC endpoint·VPC peering 각 페이지에서 확인한 범위입니다. 두 기술을 한 문장으로 직접 비교한 AWS 공식 문장은 찾지 못했습니다.',
+    'PrivateLink와 VPC Peering을 같은 것으로 설명하면 접근 범위·라우팅 모델 차이를 놓쳐 구성을 잘못 제안하게 됩니다.',
+    'Interface endpoint는 지정한 서브넷마다 사설 IP를 가진 엔드포인트 네트워크 인터페이스(ENI)를 만들어 PrivateLink 기반 서비스에 연결합니다. VPC peering은 두 VPC 사이를 사설 IP로 라우팅하는 연결이며 게이트웨이나 VPN이 아니고 transitive routing을 지원하지 않는 point-to-point입니다.',
+    '정리하면 PrivateLink는 특정 서비스에 대한 사설 접근, Peering은 두 VPC 사이의 네트워크 연결입니다. 이 비교는 각 페이지의 설명을 대조한 학습용 정리이며 공식 비교 문장이 아닙니다.',
+    '구조도에 어떤 서비스에 어떤 경로로 접근하는지(엔드포인트인지 VPC 간 연결인지)를 표시합니다. 접근 정책과 라우팅 설계는 SA 영역입니다.',
+    '“Private 접근”이라는 요구가 서비스 접근(PrivateLink)인지 네트워크 연결(Peering/Transit Gateway)인지 먼저 구분하면 설계 대화가 빨라집니다.',
+    '고객이 “인터넷을 거치지 않게”라고 하면 어떤 대상에 대한 접근인지 묻고, 서비스 접근이면 PrivateLink, VPC 간 연결이면 Peering 등을 SA와 검토합니다.',
+    'PrivateLink와 VPC Peering은 목적이 다릅니다. 전자는 특정 서비스에 사설로 접근하는 수단이고 후자는 두 VPC를 잇는 연결입니다. 요구가 어느 쪽인지 확인한 뒤 SA와 설계하겠습니다.',
+  ],
+  types: { 2: 'INTERPRETATION', 5: 'INTERPRETATION', 6: 'ARCHITECTURE_GUIDE' },
+  caveats: ['PrivateLink와 VPC Peering을 직접 비교한 공식 문장은 확인하지 못했고 각 페이지의 설명을 대조해 정리했습니다.'],
+  sales: {
+    amMustKnow: ['PrivateLink/VPC Endpoint는 서비스에 대한 사설 접근이다.', 'VPC Peering은 두 VPC 사이의 point-to-point 연결이며 transitive routing을 지원하지 않는다.', '둘은 같은 기능이 아니다.'],
+    discoveryQuestions: ['인터넷을 거치면 안 되는 통신구간이 있습니까?', '접근 대상은 AWS 서비스입니까, 다른 VPC/계정입니까?', 'SaaS나 제3자 서비스에 사설로 접근해야 합니까?', '접근 정책(누가 어떤 API를 호출하는지)은 어떻게 통제합니까?', '계정·VPC 수가 늘어날 때 연결 구조는 어떻게 관리합니까?'],
+    architectureMeaning: '구조도에서 서비스 접근 경로(엔드포인트)와 VPC 간 연결(피어링 등)을 구분해 그려야 보안 검토가 쉬워집니다.',
+    relatedServices: ['Network design', 'Landing Zone', 'Security architecture'],
+    saHandoff: ['엔드포인트 정책·DNS 설계', 'VPC 연결 모델(Peering/Transit Gateway) 선택', 'CIDR/IP Plan'],
+    nextQuestions: ['Transit Gateway와는 어떻게 다릅니까?', '엔드포인트 접근 정책은 어떻게 제한합니까?', '여러 계정에서 공유하려면 어떻게 합니까?'],
+    commonMistakes: ['PrivateLink와 Peering을 같은 것으로 설명한다.', '“Private”이라는 말만으로 보안이 충분하다고 설명한다.'],
+  },
+});
+
+export const iamFinance = card2({
+  id: 'iam-finance', title: 'IAM·Identity Center: 누가 무엇을 할 수 있는지, 임시 자격증명 중심',
+  domain: 'CLOUD_ARCHITECTURE', secondaryDomains: ['SECURITY_RESILIENCE'], tech: true,
+  primary: ['aws-iam-best'], supporting: ['aws-identity-center'],
+  texts: [
+    'AWS IAM 모범사례는 사람 사용자에게는 ID 공급자 연동(federation)으로 역할을 맡아 임시 자격증명을 받게 하고, 워크로드에는 IAM role의 임시 자격증명을 쓰며 장기 액세스 키는 불가피한 경우에만 쓰라고 권고합니다.',
+    '금융 고객은 사용자·관리자·서비스의 권한 분리와 감사를 중요하게 봅니다. 장기 키보다 임시 자격증명을 쓰는 방향은 권한 통제와 회수 부담을 줄이는 접근으로 이해할 수 있습니다.',
+    '이 카드는 IAM 모범사례와 IAM Identity Center 소개 페이지에서 확인한 범위입니다. IAM role 자체의 정의 페이지는 직접 열지 않았습니다.',
+    '“키를 발급해 주면 된다”는 방식은 키 유출과 회수 어려움을 만들고 감사 추적을 약하게 만들 수 있다는 문제의식이 있습니다.',
+    '온프레미스 워크로드에는 IAM Roles Anywhere 등으로 임시 자격증명을 전달할 수 있다고 모범사례가 안내합니다.',
+    'IAM Identity Center는 직원(workforce) 사용자를 AWS 계정과 AWS 관리형 애플리케이션에 연결하는 중앙 접근 관리 솔루션이며 단일 federation 지점과 permission set을 제공합니다(조직 인스턴스 권장).',
+    '금융 구조도에는 사용자 인증(기존 ID 공급자), 역할·권한 경계, 관리자 권한 분리, 서비스 간 역할 사용, 로그 수집 경로를 표시합니다. 정책·계정 구조 설계는 SA 영역입니다.',
+    '“누가 무엇을 할 수 있는지”를 사람·워크로드·관리자 세 층으로 나눠 묻고, 임시 자격증명 중심으로 설계하는 방향을 먼저 합의합니다.',
+    '고객의 기존 ID 체계(AD 등)와 승인 절차를 먼저 확인하세요. 권한 분리 기준을 고객이 정해야 설계가 진행됩니다.',
+    '금융권 AWS 권한은 장기 키보다 역할과 임시 자격증명 중심으로 설계합니다. 고객의 ID 체계와 권한 분리 기준을 먼저 확인한 뒤 SA와 구성하겠습니다.',
+  ],
+  types: { 2: 'INTERPRETATION', 6: 'ARCHITECTURE_GUIDE' },
+  caveats: ['IAM role 자체의 정의 페이지(id_roles)는 직접 열지 않았고 모범사례 페이지로 대체했습니다.'],
+  sales: {
+    amMustKnow: ['사람은 federation, 워크로드는 IAM role의 임시 자격증명이 권고된다.', '장기 액세스 키는 불가피한 경우에만 쓴다.', 'IAM Identity Center는 직원 접근을 중앙에서 관리한다.'],
+    discoveryQuestions: ['사용자/관리자/서비스 권한을 어떻게 분리하고 있습니까?', '기존 ID 공급자(AD 등)와 연동할 계획입니까?', '관리자 권한 승인·회수 절차는 어떻게 됩니까?', '온프레미스 워크로드도 AWS 리소스에 접근해야 합니까?', '권한 변경 이력의 감사 요구는 무엇입니까?'],
+    architectureMeaning: '권한 구조는 계정 구조와 역할 경계로 그려지며 감사 로그 수집 경로와 함께 보여야 합니다.',
+    relatedServices: ['Landing Zone', 'Identity & access design', 'Security architecture'],
+    saHandoff: ['Cross-account IAM 설계', 'Permission set·SCP 설계', '온프레미스 연동(Roles Anywhere 등)'],
+    nextQuestions: ['여러 계정의 권한을 어떻게 중앙에서 관리합니까?', '관리자 권한 남용은 어떻게 막습니까?', '권한 변경은 어떻게 감사합니까?'],
+    commonMistakes: ['장기 액세스 키를 기본 방식으로 제안한다.', '권한 분리 기준을 고객과 합의하지 않고 구성한다.'],
+  },
+});
+
+export const encryptionKeyManagement = card2({
+  id: 'encryption-key-management', title: 'KMS와 CloudHSM: “금융이면 CloudHSM 필수”가 아니다',
+  domain: 'CLOUD_ARCHITECTURE', secondaryDomains: ['SECURITY_RESILIENCE'], tech: true,
+  primary: ['aws-kms'], supporting: ['aws-cloudhsm'],
+  texts: [
+    'AWS KMS는 데이터를 암호화하고 서명하는 키를 쉽게 만들고 통제하게 해 주는 AWS 관리형 서비스입니다. KMS 키는 FIPS 140-3 Security Level 3 검증 HSM으로 보호되며 KMS 밖으로 암호화되지 않은 채 나가지 않는다고 공식 문서가 설명합니다.',
+    '금융 고객은 암호화 키의 통제 주체와 접근 감사를 중요하게 봅니다. 그래서 키를 누가 관리하는지, 어디까지 직접 통제해야 하는지가 설계 질문이 됩니다.',
+    '이 카드는 KMS 개요, CloudHSM 소개와 사용 사례 페이지에서 확인한 범위입니다. 고객의 키 정책이나 규제상 필수 여부는 다루지 않습니다.',
+    '“금융권이니 CloudHSM이 필수”처럼 단순화하면 불필요한 운영 부담과 비용을 키우고, 반대로 요구가 있는데 KMS만 제안하면 검토를 놓칩니다.',
+    'CloudHSM은 AWS 클라우드 안에서 고객이 완전히 통제하는 단일 테넌트의 범용 HSM(FIPS 모드 클러스터는 FIPS 140-2 또는 140-3 Level 3 검증)입니다.',
+    '공식 문서는 CloudHSM에서 암호화 알고리즘, 키, 애플리케이션 개발을 직접 통제하는 대신 운영 책임이 더 커진다고 설명하며, HSM을 직접 운영할 필요 없이 관리형 키 서비스만 원하면 KMS를 고려하라고 안내합니다. 사용 사례에는 규제 준수, 암복호화, 서명 검증, TLS 오프로드, 발급 CA 개인키 관리, KMS 사용자 지정 키 저장소와의 결합이 나옵니다.',
+    '구조도에 키의 위치, 키 사용 주체(역할), 접근 정책, 감사 로그 경로를 표시합니다. KMS 키 정책과 CloudHSM 적용 여부는 SA와 보안 담당이 정합니다.',
+    '키를 고객이 직접 통제해야 하는 규제·정책 요구가 있는지 먼저 확인하고, 없다면 관리형 KMS로 시작하는 접근이 일반적으로 검토됩니다. 최종 결정은 고객 보안 정책에 따릅니다.',
+    '“암호화 키를 어디서 누가 통제해야 합니까?”를 먼저 물으세요. 답이 직접 통제라면 CloudHSM, 관리형이면 KMS를 SA와 비교합니다.',
+    '키 관리는 KMS가 기본 후보이고 CloudHSM은 직접 통제가 필요한 특수 요구에서 검토합니다. 금융이라서 CloudHSM이 필수라고 보지 않고 고객의 키 통제 요구를 먼저 확인하겠습니다.',
+  ],
+  types: { 2: 'INTERPRETATION', 6: 'ARCHITECTURE_GUIDE', 7: 'ARCHITECTURE_GUIDE' },
+  caveats: ['고객별 규제·정책상 CloudHSM 필요 여부는 이 카드에서 판단하지 않습니다. 보안·법무 확인 영역입니다.'],
+  sales: {
+    amMustKnow: ['KMS는 관리형 키 관리이고 CloudHSM은 고객이 직접 통제하는 단일 테넌트 HSM이다.', 'CloudHSM은 통제가 커지는 대신 운영 책임도 커진다.', '“금융이면 CloudHSM 필수”라고 말하지 않는다.'],
+    discoveryQuestions: ['어떤 데이터에 어떤 암호화 및 Key control이 필요합니까?', '키를 고객이 직접 통제해야 하는 정책·규제 요구가 있습니까?', '키 사용·접근 로그의 감사 요구는 무엇입니까?', '키 교체·폐기 주기는 어떻게 정해져 있습니까?', 'TLS 오프로드나 서명 같은 HSM 사용 사례가 있습니까?'],
+    architectureMeaning: '키는 구조도에서 위치·사용 주체·접근 정책·감사 경로로 표시되며 데이터 위치와 함께 보여야 합니다.',
+    relatedServices: ['Security architecture', 'Data protection design', 'Compliance support'],
+    saHandoff: ['KMS Key policy', 'CloudHSM 적용 타당성과 운영 설계', '키 수명주기 관리'],
+    nextQuestions: ['KMS 키는 고객이 직접 통제할 수 있습니까?', 'CloudHSM 운영 책임은 누가 집니까?', '키 접근 감사는 어떻게 합니까?'],
+    commonMistakes: ['금융이라는 이유로 CloudHSM을 기본 제안한다.', '키 통제 요구를 확인하지 않고 암호화만 설명한다.'],
+  },
+});
+
+export const auditObservability = card2({
+  id: 'audit-observability', title: 'CloudTrail·Config·GuardDuty·Security Hub: 감사와 탐지의 기반',
+  domain: 'CLOUD_ARCHITECTURE', secondaryDomains: ['SECURITY_RESILIENCE'], tech: true,
+  primary: ['aws-cloudtrail', 'aws-config'], supporting: ['aws-guardduty', 'aws-securityhub'],
+  texts: [
+    'CloudTrail은 AWS 계정의 운영 및 위험 감사, 거버넌스, 규정 준수를 돕는 서비스로, 사용자·역할·AWS 서비스가 수행한 작업(콘솔·CLI·SDK/API)이 이벤트로 기록되어 누가, 무엇을, 언제 했는지 파악할 수 있습니다. AWS Config는 리소스의 구성, 관계, 과거 구성 이력과 변경을 보여줍니다.',
+    '금융 고객은 감사 추적과 구성 변경의 가시성을 요구하는 경우가 많습니다. 사고 조사와 점검 시 “누가 무엇을 바꿨는가”를 되짚을 수 있어야 하기 때문입니다.',
+    '이 카드는 CloudTrail, Config, GuardDuty, Security Hub 소개 페이지에서 확인한 범위입니다. 서비스 설정 방법과 고객별 로그 보관 요건은 다루지 않습니다.',
+    '“로그가 있다”와 “감사 가능하다”를 같은 것으로 말하면 보관 기간, 접근통제, 분석 체계 같은 요구를 놓칩니다.',
+    'CloudTrail 이벤트 기록 방식은 Event history(최근 90일 관리 이벤트), CloudTrail Lake, Trails(S3 전달) 세 가지입니다. Config는 Config rules와 conformance pack으로 규칙 준수 여부를 평가하고 감사를 위해 과거 구성 정보를 제공합니다.',
+    'GuardDuty는 CloudTrail 관리 이벤트, VPC flow logs, DNS 로그 등을 지속 분석해 의심스러운 활동을 탐지하는 위협 탐지 서비스입니다. Security Hub는 보안 데이터와 findings를 수집·집계해 한곳에서 보게 해 주며, 현재 문서에는 “AWS Security Hub CSPM” 명칭이 함께 쓰입니다.',
+    '구조도에 로그 수집 경로(계정·리전별), 보관 위치와 접근 권한, 탐지·집계 서비스, 담당 조직의 대응 절차를 표시합니다. 로그 보관 요건은 고객 정책과 규제 확인이 필요합니다.',
+    '통제는 “권한(IAM)–암호화(KMS)–감사(CloudTrail/Config)–탐지(GuardDuty/Security Hub)”가 함께 설명될 때 완성됩니다. 하나만 강조하면 구조가 비어 보입니다.',
+    '고객에게 감사 요구(보관 기간, 접근 주체, 분석 도구)를 물으세요. 이 서비스들은 통제 구현을 돕는 도구이며 규제 준수를 자동 보장하지 않는다고 분명히 하세요.',
+    '감사와 탐지는 CloudTrail과 Config로 기록하고 GuardDuty와 Security Hub로 탐지·집계하는 식으로 연결해 볼 수 있습니다. 다만 이는 통제 구현을 돕는 도구이며 규제 준수는 고객의 운영 체계와 함께 설계해야 합니다.',
+  ],
+  types: { 2: 'INTERPRETATION', 6: 'ARCHITECTURE_GUIDE' },
+  caveats: ['Security Hub 명칭은 현재 문서에서 “CSPM”과 함께 쓰이므로 서비스 표기 변경을 재확인하세요.'],
+  sales: {
+    amMustKnow: ['CloudTrail은 API activity 감사 기록, Config는 리소스 구성·변경 이력이다.', 'GuardDuty는 위협 탐지, Security Hub는 findings 집계다.', '이 서비스들은 통제 구현을 돕는 도구이며 규제 준수를 자동 보장하지 않는다.'],
+    discoveryQuestions: ['감사 로그의 보관 기간과 접근 주체는 어떻게 정해져 있습니까?', '구성 변경 이력을 어느 수준까지 추적해야 합니까?', '보안 이벤트 탐지·대응은 누가 담당합니까?', '기존 SIEM/관제와 연동해야 합니까?', '로그 자체의 무결성·접근통제 요구는 무엇입니까?'],
+    architectureMeaning: '감사·탐지는 로그 수집과 집계 경로, 보관 위치, 대응 조직이 한 흐름으로 그려져야 합니다.',
+    relatedServices: ['Security architecture', 'Security monitoring / MDR', 'Compliance support'],
+    saHandoff: ['로그 아키텍처(조직 단위 Trail 등)', 'Config rules·conformance pack 설계', '기존 관제 연동'],
+    nextQuestions: ['로그는 어디에 얼마나 보관해야 합니까?', '탐지 결과는 누가 어떻게 대응합니까?', '구성 변경 승인 절차와 어떻게 연결합니까?'],
+    commonMistakes: ['로그 수집만으로 감사 요구가 충족된다고 설명한다.', '탐지 서비스가 규제 준수를 보장한다고 설명한다.'],
+  },
+});

@@ -1,0 +1,7 @@
+import {it,expect} from 'vitest';
+import {emptyState,readState,writeState,makeReview,STORAGE_KEY} from '../storage/persistence';
+it('roundtrips versioned bookmarks and progress',()=>{const state=emptyState();state.bookmarks.push({contentId:'jb',kind:'case',createdAt:new Date().toISOString()});expect(writeState(localStorage,state)).toBe(true);expect(readState(localStorage).state).toEqual(state)});
+it('recovers from corrupt JSON without deleting it',()=>{localStorage.setItem(STORAGE_KEY,'broken');expect(readState(localStorage).state).toEqual(emptyState());expect(readState(localStorage).warning).toBeTruthy();expect(localStorage.getItem(STORAGE_KEY)).toBe('broken')});
+it('rejects future versions and malformed nested records',()=>{localStorage.setItem(STORAGE_KEY,JSON.stringify({...emptyState(),version:2}));expect(readState(localStorage).warning).toBeTruthy();localStorage.setItem(STORAGE_KEY,JSON.stringify({...emptyState(),progress:[null]}));expect(readState(localStorage).warning).toBeTruthy()});
+it('handles storage denial',()=>{expect(writeState({setItem(){throw Error('denied')}},emptyState())).toBe(false);expect(readState({getItem(){throw Error('denied')}}).warning).toBeTruthy()});
+it('schedules confidence correctly and wrong answers override confidence',()=>{const now=new Date('2026-09-27T12:00:00Z');expect(makeReview('q1',false,'확실',now).dueAt).toBe('2026-09-28T12:00:00.000Z');expect(makeReview('q1',true,'애매',now).dueAt).toBe('2026-09-30T12:00:00.000Z');expect(makeReview('q1',true,'확실',now).dueAt).toBe('2026-10-04T12:00:00.000Z')});
